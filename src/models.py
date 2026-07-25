@@ -28,7 +28,6 @@ class Post(db.Model):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"), nullable=False)
 
-    # CORREGIDO: Se quitó List[...] porque un Post pertenece a UN solo Usuario
     usuario: Mapped["Usuario"] = relationship(back_populates="posts")
     comentarios: Mapped[List["Comentario"]] = relationship(back_populates="post")
     likes: Mapped[List["Like"]] = relationship(back_populates="post")
