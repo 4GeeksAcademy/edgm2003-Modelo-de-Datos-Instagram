@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, UniqueConstraint, Text
 
 db = SQLAlchemy()
 
@@ -10,7 +10,7 @@ class Usuario(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    firts_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(120), nullable=False) # Corrección ortográfica
     last_name: Mapped[str] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(String(120), unique=True)
 
@@ -24,7 +24,8 @@ class Post(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(32), nullable=False)
-    content: Mapped[str] = mapped_column(String(50), nullable=False)
+    # 50 caracteres es muy poco para Instagram, se cambia a Text o String(2200)
+    content: Mapped[str] = mapped_column(Text, nullable=False) 
 
     user_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"), nullable=False)
 
@@ -48,6 +49,11 @@ class Comentario(db.Model):
 
 class Like(db.Model):
     __tablename__ = "likes"
+    
+    # Restricción: Un usuario solo puede darle like a un post una sola vez
+    __table_args__ = (
+        UniqueConstraint("user_id", "post_id", name="unique_user_post_like"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
